@@ -88,6 +88,28 @@ void light_up_by_slot(void) {
     }
 }
 
+/**
+ * @brief Apply visual and state changes after switching slot
+ */
+void apply_slot_change(uint8_t slot_now, uint8_t slot_new) {
+    uint8_t color_now = get_color_by_slot(slot_now);
+    uint8_t color_new = get_color_by_slot(slot_new);
+    rgb_marquee_slot_switch(slot_now, color_now, slot_new, color_new);
+}
+
+/**
+ * @brief Function for get current device mode
+ */
+device_mode_t get_device_mode(void) {
+    return rfid_state;
+}
+
+/**
+ * @brief Get the color by slot
+ *
+ * @param slot slot number, 0 - 7
+ * @return uint8_t Color 0R, 1G, 2B, 3Y, 4C, 5M, 6W
+ */
 uint8_t get_color_by_slot(uint8_t slot) {
     switch (slot) {
         case 0: return 0; // Слот 1 — Красный
@@ -99,26 +121,5 @@ uint8_t get_color_by_slot(uint8_t slot) {
         case 6: return 6; // Слот 7 — Белый
         case 7: return 0; // Слот 8 — Красный
         default: return 2;
-    }
-}
-
-
-/**
- * @brief Get the color by slot
- *
- * @param slot slot number, 0 - 7
- * @return uint8_t Color 0R, 1G, 2B
- */
-uint8_t get_color_by_slot(uint8_t slot) {
-    tag_slot_specific_type_t tag_types;
-    tag_emulation_get_specific_types_by_slot(slot, &tag_types);
-    bool enabled_lf = is_slot_enabled(slot, TAG_SENSE_LF);
-    bool enabled_hf = is_slot_enabled(slot, TAG_SENSE_HF);
-    if (tag_types.tag_hf != TAG_TYPE_UNDEFINED && tag_types.tag_lf != TAG_TYPE_UNDEFINED && enabled_hf && enabled_lf) {
-        return 0;   // Dual -frequency card emulation, return R, indicate a dual -frequency card
-    } else if (tag_types.tag_hf != TAG_TYPE_UNDEFINED && enabled_hf) {   //High -frequency emulation, return G
-        return 1;
-    } else {    // Low -frequency emulation, return B
-        return 2;
     }
 }
