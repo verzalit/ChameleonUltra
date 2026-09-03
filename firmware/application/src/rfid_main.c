@@ -88,21 +88,20 @@ void light_up_by_slot(void) {
     }
 }
 
-/**
- * @brief Apply visual and state changes after switching slot
- */
-void apply_slot_change(uint8_t slot_now, uint8_t slot_new) {
-    uint8_t color_now = get_color_by_slot(slot_now);
-    uint8_t color_new = get_color_by_slot(slot_new);
-    rgb_marquee_slot_switch(slot_now, color_now, slot_new, color_new);
+uint8_t get_color_by_slot(uint8_t slot) {
+    switch (slot) {
+        case 0: return 0; // Слот 1 — Красный
+        case 1: return 3; // Слот 2 — Жёлтый
+        case 2: return 1; // Слот 3 — Зелёный
+        case 3: return 4; // Слот 4 — Бирюзовый
+        case 4: return 2; // Слот 5 — Синий
+        case 5: return 5; // Слот 6 — Пурпурный
+        case 6: return 6; // Слот 7 — Белый
+        case 7: return 0; // Слот 8 — Красный
+        default: return 2;
+    }
 }
 
-/**
- * @brief Function for get current device mode
- */
-device_mode_t get_device_mode(void) {
-    return rfid_state;
-}
 
 /**
  * @brief Get the color by slot
