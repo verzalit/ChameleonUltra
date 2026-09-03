@@ -50,7 +50,7 @@ jobs:
           draft: false
           prerelease: true
           target_commitish: ${{ github.sha }}
-          generate_release_notes: true
+          generate_release_notes: false
           files: release-artifacts/*
       - name: Fix up release tag
         run: |
@@ -85,7 +85,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           draft: false
           target_commitish: ${{ github.sha }}
-          generate_release_notes: true
+          generate_release_notes: false
           append_body: true
           files: release-artifacts/*
 
