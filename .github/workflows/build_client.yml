@@ -1,77 +1,66 @@
-# This is just a placeholder while the whole PyInstaller thing gets figured out
-name: Client build
+name: Firmware build
 
 on:
+  workflow_dispatch:
   workflow_call:
-    inputs:
-      checkout-sha:
-        required: false
-        type: string
 
 jobs:
-  build_client:
-    name: Build client
+  build_fw_builder:
+    name: Build fw-builder Docker image
+    runs-on: ubuntu-latest
+    outputs:
+      image_ref: ${{ steps.local-image.outputs.image_ref }}
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Check out the repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build Docker image for this workflow
+        uses: docker/build-push-action@v7
+        with:
+          context: firmware
+          tags: chameleonultra-fw-builder:pr
+          outputs: type=docker,dest=${{ runner.temp }}/fw-builder.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v7
+        with:
+          name: firmware-builder-image
+          path: ${{ runner.temp }}/fw-builder.tar
+          retention-days: 1
+      - name: Use local builder image
+        id: local-image
+        run: echo "image_ref=chameleonultra-fw-builder:pr" >> "$GITHUB_OUTPUT"
+
+  build_fw:
+    name: Build firmware
+    runs-on: ubuntu-latest
+    needs: build_fw_builder
     permissions:
       contents: read
-    strategy:
-      matrix:
-        include: 
-          - name: windows
-            os: windows-latest
-            pre_command: |
-              ? .
-            bundle_command: |
-              Compress-Archive -Path software\dist\* -DestinationPath client-windows.zip
-          - name: linux
-            os: ubuntu-latest
-            pre_command: |
-              true
-            bundle_command: |
-              (cd software/dist && zip -r "$OLDPWD/client-linux.zip" .)
-          - name: macos
-            os: macos-latest
-            pre_command: |
-              true
-            bundle_command: |
-              (cd software/dist && zip -r "$OLDPWD/client-macos.zip" .)
-    runs-on: ${{ matrix.os }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.checkout-sha == null && github.sha || inputs.checkout-sha }}
+          fetch-depth: 0
           persist-credentials: false
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - name: Download Docker image
+        uses: actions/download-artifact@v8
         with:
-          python-version: '3.12'
-      - name: Install PyInstaller and client dependencies
+          name: firmware-builder-image
+          path: ${{ runner.temp }}
+      - name: Load Docker image
+        run: docker load --input "${{ runner.temp }}/fw-builder.tar"
+      - name: Build firmware
         run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          pip install -r software/script/requirements.txt
-      - name: Run OS specific setup
-        run: ${{ matrix.pre_command }}
-      - name: Compile native code
-        run: |
-          cd software/src
-          mkdir out
-          cd out
-          cmake ..
-          cmake --build . --config Release
-      - name: Run PyInstaller
-        run: |
-          cd software
-          pyinstaller pyinstaller.spec
-      - name: Upload built client
-        uses: actions/upload-artifact@v7
-        with:
-          name: client-${{ matrix.name }}
-          path: software/dist/*
-      - name: Zip up client for release
-        run: ${{ matrix.bundle_command }}
+          docker run --rm -v ${PWD}:/workdir -e CURRENT_DEVICE_TYPE=ultra "${{ needs.build_fw_builder.outputs.image_ref }}" firmware/build.sh
       - name: Upload release artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: release-artifacts-${{ matrix.name }}
-          path: client-${{ matrix.name }}.zip
+          name: ultra-firmware-dfu
+          path: firmware/objects/ultra-dfu-app.zip
+          
