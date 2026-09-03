@@ -1,16 +1,10 @@
 name: Firmware build
 
 on:
-  workflow_call:
-    inputs:
-      checkout-sha:
-        required: false
-        type: string
-      publish-builder:
-        description: Build and publish the firmware builder image
-        required: false
-        type: boolean
-        default: true
+  push:
+    branches:
+      - main
+  workflow_dispatch:  
 
 jobs:
   build_fw_builder:
