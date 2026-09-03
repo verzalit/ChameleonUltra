@@ -424,12 +424,12 @@ CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
 
 # Versioning flags
-GIT_VERSION := "1.0.0"
-CFLAGS += -DGIT_VERSION='\"$(GIT_VERSION)\"'
+CFLAGS += -DGIT_VERSION=\"1.0.0\"
 APP_FW_VER_MAJOR := 1
 APP_FW_VER_MINOR := 0
 
-CFLAGS += -DAPP_FW_VER_MAJOR=$(APP_FW_VER_MAJOR) -DAPP_FW_VER_MINOR=$(APP_FW_VER_MINOR)
+CFLAGS += -DAPP_FW_VER_MAJOR=1 -DAPP_FW_VER_MINOR=0
+
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
