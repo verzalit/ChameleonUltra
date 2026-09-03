@@ -424,7 +424,8 @@ CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
 
 # Versioning flags
-CFLAGS += -DGIT_VERSION=\"1.0.0\"
+GIT_VERSION := "1.0.0"
+CFLAGS += -DGIT_VERSION='\"$(GIT_VERSION)\"'
 APP_FW_VER_MAJOR := 1
 APP_FW_VER_MINOR := 0
 
