@@ -112,7 +112,7 @@ device_mode_t get_device_mode(void) {
  */
 uint8_t get_color_by_slot(uint8_t slot) {
     switch (slot) {
-        case 0: return 0; // Слот 1 — Красный
+        case 0: return 6; // Слот 1 — Белый
         case 1: return 3; // Слот 2 — Жёлтый
         case 2: return 1; // Слот 3 — Зелёный
         case 3: return 4; // Слот 4 — Бирюзовый
