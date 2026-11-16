@@ -336,6 +336,15 @@ bool settings_set_led_slot_color(uint8_t slot, uint8_t color) {
     return true;
 }
 
+rgb_color_t get_color_by_slot(uint8_t slot) {
+    uint8_t custom_color = settings_get_led_slot_color(slot);
+    if (custom_color >= 1 && custom_color <= 7) {
+        return (rgb_color_t)custom_color;
+    }
+
+    // Дальше остаётся твой существующий код с цветами по умолчанию:
+    // ...
+}
 uint8_t settings_get_led_slot_color(uint8_t slot) {
     if (slot >= 8) {
         return 0;
