@@ -215,4 +215,7 @@
 #define DATA_CMD_EM4X05_READSNIFF               (3032)
 #define DATA_CMD_LF_SNIFF                       (3031)
 
+#define DATA_CMD_SET_SLOT_LED_COLOR         (1090)
+#define DATA_CMD_GET_SLOT_LED_COLOR         (1091)
+
 #endif
