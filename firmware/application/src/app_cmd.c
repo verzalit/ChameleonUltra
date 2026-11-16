@@ -3221,7 +3221,36 @@ static data_frame_tx_t *cmd_processor_hf14a_4_debug_counters(uint16_t cmd, uint1
     return data_frame_make(cmd, STATUS_SUCCESS, 4, buf);
 }
 #endif
+static data_frame_tx_t* cmd_processor_set_slot_led_color(uint16_t cmd, uint16_t status, uint16_t length, uint8_t *data) {
+    if (length != 2 || data[0] >= 8 || data[1] > 7) {
+        return data_frame_make(cmd, STATUS_PAR_ERR, 0, NULL);
+    }
+
+    uint8_t slot = data[0];
+    uint8_t color = data[1];
+
+    settings_set_led_slot_color(slot, color);
+
+    // Сразу обновляем свечение, если изменён текущий активный слот
+    if (slot == tag_emulation_get_slot()) {
+        set_slot_light_color(get_color_by_slot(slot));
+        set_slot_light_index(slot);
+    }
+
+    return data_frame_make(cmd, STATUS_DEVICE_SUCCESS, 0, NULL);
+}
+
+static data_frame_tx_t* cmd_processor_get_slot_led_color(uint16_t cmd, uint16_t status, uint16_t length, uint8_t *data) {
+    uint8_t colors[8];
+    for (uint8_t i = 0; i < 8; i++) {
+        colors[i] = settings_get_led_slot_color(i);
+    }
+    return data_frame_make(cmd, STATUS_DEVICE_SUCCESS, 8, colors);
+}
+
 static cmd_data_map_t m_data_cmd_map[] = {
+    {   DATA_CMD_SET_SLOT_LED_COLOR,            cmd_processor_set_slot_led_color            },
+    {   DATA_CMD_GET_SLOT_LED_COLOR,            cmd_processor_get_slot_led_color            },
     {    DATA_CMD_GET_APP_VERSION,              NULL,                        cmd_processor_get_app_version,               NULL                   },
     {    DATA_CMD_CHANGE_DEVICE_MODE,           NULL,                        cmd_processor_change_device_mode,            NULL                   },
     {    DATA_CMD_GET_DEVICE_MODE,              NULL,                        cmd_processor_get_device_mode,               NULL                   },
