@@ -75,8 +75,6 @@ typedef struct {
     uint8_t led_slot_color[8]; // Пользовательские цвета для 8 слотов (0 = по умолчанию, 1..7 = цвет)
 } settings_data_t;
 
-bool settings_set_led_slot_color(uint8_t slot, uint8_t color);
-uint8_t settings_get_led_slot_color(uint8_t slot);
 void settings_init_config(void);
 void settings_migrate(void);
 void settings_load_config(void);
@@ -99,4 +97,6 @@ void settings_init_sleep_timeout_config(void);
 uint16_t settings_get_long_press_threshold(void);
 void settings_set_long_press_threshold(uint16_t duration);
 void settings_init_long_press_threshold_config(void);
+bool settings_set_led_slot_color(uint8_t slot, uint8_t color);
+uint8_t settings_get_led_slot_color(uint8_t slot);
 #endif
