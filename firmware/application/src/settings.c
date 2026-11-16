@@ -328,3 +328,18 @@ void settings_set_long_press_threshold(uint16_t duration) {
     }
     config.long_press_threshold = duration;
 }
+bool settings_set_led_slot_color(uint8_t slot, uint8_t color) {
+    if (slot >= 8 || color > 7) {
+        return false;
+    }
+    config.led_slot_color[slot] = color;
+    return true;
+}
+
+uint8_t settings_get_led_slot_color(uint8_t slot) {
+    if (slot >= 8) {
+        return 0;
+    }
+    return config.led_slot_color[slot];
+}
+
